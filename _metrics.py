@@ -17,3 +17,9 @@ def RSquared(ticker):
     _.columns = ['Earnings','Population']
     mod = smf.ols('Earnings ~ np.log(Population)', _).fit()
     return mod.rsquared
+
+def ForecastStock(ticker):
+    raise
+
+def ForecastIndicator(indicator):
+    raise
