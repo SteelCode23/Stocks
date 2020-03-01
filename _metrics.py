@@ -18,8 +18,15 @@ def RSquared(ticker):
     mod = smf.ols('Earnings ~ np.log(Population)', _).fit()
     return mod.rsquared
 
+
 def ForecastStock(ticker):
     raise
 
+
 def ForecastIndicator(indicator):
+    ''''''
     raise
+
+
+def CalculateReturnFromPortfolio(stocklist):
+    '''Takes a list of stocks and returns the estimated return from the stocks.'''
