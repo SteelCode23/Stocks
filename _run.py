@@ -2,7 +2,7 @@ from _metrics import RSquared
 from _stocks import *
 from _indicators import indicators
 from _config import start, end
-
+from _sp import _stocks
 from datetime import datetime
 import pandas as pd
 import numpy as np
@@ -21,10 +21,14 @@ def Correlations():
 	        except Exception as e:
 	            print(e)
 
+def SimpleCalc(ticker):
+	return (ticker, RSquared(ticker))
+
 #Plots
 def Plots():
 	import pandas_datareader.data as web
 	import matplotlib.pyplot as plt
+
 	from pandas_datareader import data
 	f = plt.figure(figsize=(20,10))
 	plt.title("S&P 500")
@@ -52,5 +56,19 @@ def Plots():
 	plt.title('Population')
 	gdp.pct_change().plot(ax=f.gca())	
 	plt.show()
-Plots()
-Correlations()
+#Plots()
+#Correlations()
+_score = {}
+#_stocks = ['MSFT','AAPL']
+_err = []
+for stock in _stocks:
+	try:
+		output = SimpleCalc(stock)
+		_score[output[0]] = output[1]
+	except Exception as e:
+		_err.append(e)
+
+
+_try = pd.DataFrame.from_dict(_score, orient='index')
+_try.to_excel('Output.xlsx')
+print(_err)

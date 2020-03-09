@@ -540,3 +540,4 @@ class Stock:
 		ZBH = data.DataReader("ZBH",start=start, end=end,data_source='yahoo')
 		ZION = data.DataReader("ZION",start=start, end=end,data_source='yahoo')
 		ZTS = data.DataReader("ZTS",start=start, end=end,data_source='yahoo')
+		return 
