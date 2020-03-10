@@ -22,6 +22,43 @@ def RSquared(ticker):
     mod = smf.ols('Earnings ~ np.log(OilPrices)', _).fit()
     return mod.rsquared
 
+
+def DaysReturns(ticker):
+    from pandas_datareader import data
+    start = "2020-03-06"
+    end = "2020-03-09"
+    _ = data.DataReader(ticker,start = start, end = end,data_source='yahoo')
+    output = [ticker,_.pct_change()['Adj Close'].max()]
+    return output
+
+
+def QuartersReturns(ticker):
+    from pandas_datareader import data
+    start = "2020-01-01"
+    end = "2020-03-09"
+    _ = data.DataReader(ticker,start = start, end = end,data_source='yahoo')
+    output = [ticker,_['Adj Close'].pct_change().cumsum().last('D')[0]]
+    return output
+
+
+def YearsReturns(ticker):
+    from pandas_datareader import data
+    start = "2019-03-09"
+    end = "2020-03-09"
+    _ = data.DataReader(ticker,start = start, end = end,data_source='yahoo')
+    output = [ticker,_['Adj Close'].pct_change().cumsum().last('D')[0]]
+    return output
+
+
+def TenYearsReturns(ticker):
+    from pandas_datareader import data
+    start = "2010-03-09"
+    end = "2020-03-09"
+    _ = data.DataReader(ticker,start = start, end = end,data_source='yahoo')
+    output = [ticker,_['Adj Close'].pct_change().cumsum().last('D')[0]]
+    return output
+
+
 def ForecastStock(ticker):
     raise
 

@@ -1,4 +1,6 @@
-from _metrics import RSquared
+
+
+from _metrics import RSquared, DaysReturns,QuartersReturns,YearsReturns,TenYearsReturns
 from _stocks import *
 from _indicators import indicators
 from _config import start, end
@@ -58,17 +60,45 @@ def Plots():
 	plt.show()
 #Plots()
 #Correlations()
+# _score = {}
+# #_stocks = ['MSFT','AAPL']
+# _err = []
+# for stock in _stocks:
+# 	try:
+# 		output = YearsReturns(stock)
+# 		_score[output[0]] = output[1]
+# 	except Exception as e:
+# 		_err.append(e)
+
+# _try_ = pd.DataFrame.from_dict(_score, orient='index')
+# _try_.to_excel('YearsReturns.xlsx')
+
 _score = {}
 #_stocks = ['MSFT','AAPL']
 _err = []
 for stock in _stocks:
 	try:
-		output = SimpleCalc(stock)
+		output = YearsReturns(stock)
 		_score[output[0]] = output[1]
 	except Exception as e:
 		_err.append(e)
 
-
-_try = pd.DataFrame.from_dict(_score, orient='index')
-_try.to_excel('Output.xlsx')
+_try_ = pd.DataFrame.from_dict(_score, orient='index')
+_try_.to_excel('YearsReturns.xlsx')
 print(_err)
+
+
+_score = {}
+#_stocks = ['MSFT','AAPL']
+_err = []
+for stock in _stocks:
+	try:
+		output = TenYearsReturns(stock)
+		_score[output[0]] = output[1]
+	except Exception as e:
+		_err.append(e)
+
+_try_ = pd.DataFrame.from_dict(_score, orient='index')
+_try_.to_excel('TenYearsReturns.xlsx')
+print(_err)
+
