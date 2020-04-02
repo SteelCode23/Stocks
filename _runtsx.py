@@ -62,13 +62,13 @@ def Plots():
 	plt.show()
 
 
-def GetCompanies():
+def GetTSXCompanies():
     from sqlalchemy import create_engine
     import pandas as pd
     engine = create_engine('mssql://DESKTOP-C3PKM76\\SQLEXPRESS01/StockSniper?trusted_connection=yes&driver=ODBC+Driver+13+for+SQL+Server')
     con = engine.connect()    
     sql = """
-    SELECT * FROM Companies
+    SELECT * FROM TSX
     """
     _ = (pd.read_sql(sql,con))
     con.close()
@@ -98,7 +98,7 @@ def BuildColumnsForExcel():
 
 def GetRiskiness(ticker, start, end):
     import pandas as pd
-    _ =GetDataInPeriod(ticker,start,end)
+    _ =GetTSXData(ticker,start,end)
     output_ = pd.DataFrame(columns = ['Ticker','PriceRisk','ReturnRisk','Volatility'])
     output_['PriceRisk'] = np.std(_)
     output_['ReturnRisk'] = np.std(_.pct_change())
@@ -107,7 +107,7 @@ def GetRiskiness(ticker, start, end):
     return output_.set_index('Ticker')
 
 
-def GetDataInPeriod(ticker, start,end):
+def GetTSXData(ticker, start,end):
     from pandas_datareader import data
     from pandas.tseries.offsets import BDay
     from sqlalchemy import create_engine
@@ -118,7 +118,7 @@ def GetDataInPeriod(ticker, start,end):
     end = DateKey(end)
     sql = """SELECT [Adj Close], DateKey FullDate
     FROM
-    StockSniper.dbo.StockPrices
+    StockSniper.dbo.[TSXStockPrices]
     WHERE DateKey BETWEEN  '""" + str(start) + """' and  '""" + str(end) + """' and Ticker = '""" + str(ticker) +"""'
     """
     _ = (pd.read_sql(sql,con))
@@ -140,63 +140,73 @@ _days_of_week = {
 	0:"Monday",1:"Tuesday",2:"Wednesday",3:"Thursday",4:"Friday"
 }
 
-end = pd.datetime.today() - BDay(0)
+end = pd.datetime.today() - BDay(1)
 
-risk = GetBulkRiskiness(_stocks, start = pd.datetime.today() - BDay(60), end = pd.datetime.today())
+#risk = GetBulkRiskiness(_stocks, start = pd.datetime.today() - BDay(60), end = pd.datetime.today())
 
-
-
+try:
+	risk = pd.read_excel("Risk.xlsx")
+	risk.to_excel("Risk.xlsx")
+except Exception:
+	pass
 import pandas as pd
-end = pd.datetime.today() - BDay(0)
-Today = (GetPeriodReturns(end - BDay(1),end))
+end = pd.datetime.today() - BDay(1)
+Today = (GetTSXReturns(end - BDay(1),end))
 Today.columns = ["Monday"]
 end = pd.datetime.today() - BDay(2) 
-Thursday = (GetPeriodReturns(end - BDay(1),end))
+Thursday = (GetTSXReturns(end - BDay(1),end))
 Thursday.columns = ["Friday"]
 end = pd.datetime.today() - BDay(3) 
-Wednesday = (GetPeriodReturns(end - BDay(1),end))
+Wednesday = (GetTSXReturns(end - BDay(1),end))
 Wednesday.columns = ["Thursday"]
 end = pd.datetime.today() - BDay(4) 
-Tuesday = (GetPeriodReturns(end - BDay(1),end))
+Tuesday = (GetTSXReturns(end - BDay(1),end))
 Tuesday.columns = ["Wednesday"]
 print("Checkpoint 1")
 end = pd.datetime.today() - BDay(5) 
-Monday = (GetPeriodReturns(end - BDay(1),end))
+Monday = (GetTSXReturns(end - BDay(1),end))
 Monday.columns =["Tuesday"]
 
 
 #Reset End Date to mean yesterday.
-end = pd.datetime.today() - BDay(0)
-Week = (GetPeriodReturns(end - BDay(5),end))
+end = pd.datetime.today() - BDay(1)
+Week = (GetTSXReturns(end - BDay(5),end))
 Week.columns = ['Week']
-Month = (GetPeriodReturns(end - BDay(20),end))
+Month = (GetTSXReturns(end - BDay(20),end))
 Month.columns = ['Month']
-YTD = (GetPeriodReturns("2020-01-02" ,end))
+YTD = (GetTSXReturns("2020-01-02" ,end))
 YTD.columns = ['YTD']
-Year = (GetPeriodReturns(end - BDay(250),end))
+Year = (GetTSXReturns(end - BDay(250),end))
 Year.columns = ['Year']
 print("Checkpoint 2")
-TwoYear = (GetPeriodReturns(end - BDay(500),end))
+TwoYear = (GetTSXReturns(end - BDay(500),end))
 TwoYear.columns = ['TwoYear']
-FiveYear = (GetPeriodReturns(end - BDay(1250),end))
+FiveYear = (GetTSXReturns(end - BDay(1250),end))
 FiveYear.columns = ['FiveYear']
-TenYear = (GetPeriodReturns(end - BDay(2500),end))
+TenYear = (GetTSXReturns(end - BDay(2500),end))
 TenYear.columns = ['TenYear']
-TwentyYear = (GetPeriodReturns(end - BDay(5000),end))
+TwentyYear = (GetTSXReturns(end - BDay(5000),end))
 TwentyYear.columns = ['TwentyYear']
-Companies = GetCompanies()
+Companies = GetTSXCompanies()
 _today_  = (pd.datetime.today())- BDay(1)
 _today_ = str(_today_).split(" ")[0]
 #Indicators = GetCorrelations("2019-01-02",_today_)
 fundamentals = GetLatestFundamentals()
 
-output = Monday.join(Tuesday).join(Wednesday).join(Thursday).join(Today).join(Week).join(Month).join(risk).join(YTD).join(Year).join(TwoYear).join(FiveYear).join(TenYear).join(TwentyYear).join(fundamentals).join(Companies)
+print(Monday)
+print(Tuesday)
+print(Wednesday)
+import pdb
+try:
+	output = Monday.join(Tuesday).join(Wednesday).join(Thursday).join(Today).join(Week).join(Month).join(risk).join(YTD).join(Year).join(TwoYear).join(FiveYear).join(TenYear).join(TwentyYear).join(Companies)
+except Exception:
+	pdb.set_trace()
 
 print("Checkpoint 3")
 try:
-	output.drop_duplicates().to_excel("C:/Users/Steel/StockReturns202003202.xlsx")
+	output.drop_duplicates().to_excel("C:/Users/Steel/TSX.xlsx")
 except Exception:
-	output.to_excel("C:/Users/Steel/StockReturns4" + str(_today_) + ".xlsx")
+	output.to_excel("C:/Users/Steel/TSX3" + str(_today_) + ".xlsx")
 #Plots()
 #Correlations()
 # _score = {}

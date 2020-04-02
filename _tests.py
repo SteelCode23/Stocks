@@ -1,12 +1,19 @@
-from pandas_datareader import data
-start = "2005-1-1"
-end = "2020-2-21"
-MMM = data.DataReader("MMM",start=start, end=end,data_source='yahoo')
-ABT = data.DataReader("ABT",start=start, end=end,data_source='yahoo')
-ABBV = data.DataReader("ABBV",start=start, end=end,data_source='yahoo')
-S_AND_P = {'MMM':MMM,'ABT':ABT,'ABBV':ABBV}
-for key, values in S_AND_P.items():
-	print(key, values)
-	MMM[key] = values['Adj Close']
-MMM.to_excel("C:/Data/Output.xlsx")
+from _metrics import GetPeriodReturns
+from pandas.tseries.offsets import BDay
 
+end = pd.datetime.today() - BDay(1)
+
+Today = (GetPeriodReturns(end - BDay(1),end))
+Today.columns = ['Today']
+Week = (GetPeriodReturns(end - BDay(5),end))
+Week.columns = ['Week']
+Month = (GetPeriodReturns(end - BDay(20),end))
+Month.columns = ['Month']
+YTD = (GetPeriodReturns("2020-01-02" ,end))
+YTD.columns = ['YTD']
+Year = (GetPeriodReturns(end - BDay(250),end))
+Year.columns = ['Year']
+TenYear = (GetPeriodReturns(end - BDay(2500),end))
+TenYear.columns = ['TenYear']
+TwentyYear = (GetPeriodReturns(end - BDay(5000),end))
+TwentyYear.columns = ['TwentyYear']
